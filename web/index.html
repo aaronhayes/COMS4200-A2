@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>Network visualiser</title>
+	
+	<style type="text/css">
+		#graph-container {
+			max-width: 400px;
+			height: 400px;
+			margin: auto;
+		}
+	</style>
+	
+	<!-- <script src="js/d3.min.js"></script> //-->
+	<script src="js/jquery-2.1.1.min.js"></script>
+	<script src="js/sigma.min.js"></script>
+	<script src="js/plugins/sigma.parsers.json.min.js"></script>
+	
+	<script>
+	$(function() {
+		$('#sometext').html('hi');
+		$.post(
+			'http://172.16.139.135:8000/OF/',
+			'{"method":"get_switches","id":1}',
+			function(data) {
+				//$('#sometext').html("Repsonse: <br/>" + data.result[1].dpid);
+				
+				//$('#sometext2').html("Repsonse: <br/>" + JSON.stringify(data));
+			}
+		);
+		
+		var args = '00-00-00-00-00-01';
+		
+		$.post(
+			'http://172.16.139.135:8000/OF/',
+			'{"method":"get_flow_stats","params":{"dpid":"00-00-00-00-00-01"},"id":1}',
+			function(data) {
+				$('#sometext').html("Repsonse: <br/>" + JSON.stringify(data));
+			}
+		);
+	});
+	
+		
+	sigma.parsers.json('js/data.json', {
+		container: 'graph-container',
+		settings: {
+			defaultNodeColor: '#999999'
+		}
+	});
+	</script>
+	
+
+</head>
+<body>
+
+<div id="container">
+	
+	<div id="graph-container"></div>
+	
+	<div id="sometext"></div>
+	
+	<div id="sometext2"></div>
+	
+</div>
+
+</body>
+</html>
