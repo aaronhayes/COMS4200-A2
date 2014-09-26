@@ -52,3 +52,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+
+
+# HTML/JavaScript
+.DS_Store
+
+
+
