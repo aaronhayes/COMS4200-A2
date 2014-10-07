@@ -19,6 +19,7 @@ from pox.openflow.of_json import *
 from pox.lib.recoco import Timer
 from pox.lib.revent import Event, EventHalt
 
+import threading
 import datetime
 from peewee import *
 
@@ -61,11 +62,11 @@ class StatisticsMonitor (object) :
 			dpidToStr(event.connection.dpid), byte_count, packet_count, flow_count)
                 
                 '''
-                UNCOMMENT the following two lines to save to the database.
+                Write to database. 
                 '''
-                #record = Test_Table(timestamp=datetime.datetime, byte_count=322)
-                #record.save()
-		
+                write_thread = DBWriteThread(byte_count)
+                write_thread.start()
+
 
 	def _handle_PortStatsReceived (self, event) :
 		stats = flow_stats_to_list(event.stats)
@@ -127,6 +128,21 @@ class Test_Table (BaseModel):
         """
         
         timestamp = DateTimeField()
-        byte_count = IntegerField()
+        count_bytes = IntegerField()
 
 
+class DBWriteThread (threading.Thread):
+        
+        def __init__(self, byte_count):
+                threading.Thread.__init__(self)
+                self._byte_count = byte_count
+
+        def run(self):
+                record = Test_Table(timestamp=datetime.datetime.now(), count_bytes=self._byte_count)
+ 
+                try:
+                        record.save()
+                except Exception:
+                        #log.warning("Unable to write to the database.")
+                        pass
+                
