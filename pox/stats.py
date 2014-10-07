@@ -49,7 +49,7 @@ class StatisticsMonitor (object) :
 		for e in event.stats:
 			byte_count += e.byte_count
 			packet_count += e.packet_count
-			flow_count += 1 # Have flows even if empty dueto stats request
+			flow_count += 1
 		
 		log.info("Traffic From %s: %s bytes (%s packets) over %s flows",
 			dpidToStr(event.connection.dpid), byte_count, packet_count, flow_count)
