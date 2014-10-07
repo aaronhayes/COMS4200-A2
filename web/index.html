@@ -19,23 +19,35 @@
 	<script src="js/plugins/sigma.parsers.json.min.js"></script>
 	
 	<script>
+	/*
+	Start pox with web.webcore and openflow.webservice - like:
+	./pox.py web.webcore openflow.webservice
+	
+	CHANGE THIS TO THE IP ADDRESS OF THE MININET VM, where the pox controller is running
+	*/
+	var ip_address = '172.16.91.128';
+	
+	
 	$(function() {
 		$('#sometext').html('hi');
+		
 		$.post(
-			'http://172.16.139.135:8000/OF/',
+			'http://' + ip_address + ':8000/OF/',
 			'{"method":"get_switches","id":1}',
 			function(data) {
 				//$('#sometext').html("Repsonse: <br/>" + data.result[1].dpid);
 				
-				//$('#sometext2').html("Repsonse: <br/>" + JSON.stringify(data));
+				$('#sometext2').html("Repsonse: <br/>" + JSON.stringify(data));
+				
+				//$('#sometext3').html("Repsonse: <br/>" + JSON.stringify(data.result[0].n_tables));
 			}
 		);
 		
 		var args = '00-00-00-00-00-01';
 		
 		$.post(
-			'http://172.16.139.135:8000/OF/',
-			'{"method":"get_flow_stats","params":{"dpid":"00-00-00-00-00-01"},"id":1}',
+			'http://' + ip_address + ':8000/OF/',
+			'{"method":"get_flow_stats","params":{"dpid":"00-00-00-00-00-02"},"id":1}',
 			function(data) {
 				$('#sometext').html("Repsonse: <br/>" + JSON.stringify(data));
 			}
@@ -59,10 +71,12 @@
 	
 	<div id="graph-container"></div>
 	
-	<div id="sometext"></div>
+	<h2>get_flow_stats</h2><br/>
+	<div id="sometext"></div><br>
 	
-	<div id="sometext2"></div>
-	
+	<h2>get_switches</h2><br/>
+	<div id="sometext2"></div><br>
+
 </div>
 
 </body>

@@ -1,0 +1,3 @@
+# Instal python mysql connector from apt-get repository - pretty straightforward...
+
+sudo apt-get install python-mysqldb
