@@ -1,3 +1,5 @@
-# Instal python mysql connector from apt-get repository - pretty straightforward...
-
-sudo apt-get install python-mysqldb
+# Install peewee, an ORM python library
+cd ~
+git clone https://github.com/coleifer/peewee.git
+cd peewee
+sudo python setup.py install
