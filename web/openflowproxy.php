@@ -15,16 +15,9 @@ if (!isset($result['error'])) {
 	$postData;
 
 	if (!isset($_POST['s'])) {
-		$postData = array(
-			'method' => $method,
-			'id' => 1
-		);
+		$postData = '{"method":"get_switches","id":1}';
 	} else {
-                $postData = array(
-                        'method' => $method,
-			'params' => '{"dpid":"' . $_POST['s'] . '"}',
-			'id' => 1
-                );
+		$postData = '{"method":"get_flow_stats","params":{"dpid":"' . $_POST['s'] . '"},"id":1}';
 	}
 
 	$ch = curl_init($url);
@@ -35,7 +28,7 @@ if (!isset($result['error'])) {
     		CURLOPT_HTTPHEADER => array(
         	'Content-Type: application/json'
     	),
-    	CURLOPT_POSTFIELDS => json_encode($postData)
+    	CURLOPT_POSTFIELDS => $postData
 	));
 
 	$response = curl_exec($ch);
