@@ -58,6 +58,23 @@
                 }
         });
 
+        jQuery.ajax({
+                type: "POST",
+                url: 'http://mininet-vm/web/openflowproxy.php',
+                dataType: 'json',
+                data: {functionname: 'get_switch_desc', s: '00-00-00-00-00-01'},
+
+                success: function (obj, ts) {
+                        if (!('error' in obj)) {
+                                var result = obj.result;
+                                $('#sometext3').html("Reponse: <br/>" + JSON.stringify(result));
+                        } else {
+                                console.log(obj.error);
+                        }
+                }
+        });
+
+
 		
 	sigma.parsers.json('js/data.json', {
 		container: 'graph-container',
@@ -81,6 +98,8 @@
 	<h2>get_switches</h2><br/>
 	<div id="sometext2"></div><br>
 
+	<h2>get_switch_desc</h2><br/>
+	<div id="sometext3"></div><br/>
 </div>
 
 </body>

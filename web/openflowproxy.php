@@ -15,9 +15,9 @@ if (!isset($result['error'])) {
 	$postData;
 
 	if (!isset($_POST['s'])) {
-		$postData = '{"method":"get_switches","id":1}';
+		$postData = '{"method":"' . $method . '","id":1}';
 	} else {
-		$postData = '{"method":"get_flow_stats","params":{"dpid":"' . $_POST['s'] . '"},"id":1}';
+		$postData = '{"method":"' . $method . '","params":{"dpid":"' . $_POST['s'] . '"},"id":1}';
 	}
 
 	$ch = curl_init($url);
