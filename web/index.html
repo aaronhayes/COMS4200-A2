@@ -25,35 +25,39 @@
 	
 	CHANGE THIS TO THE IP ADDRESS OF THE MININET VM, where the pox controller is running
 	*/
-	var ip_address = '172.16.91.128';
-	
-	
-	$(function() {
-		$('#sometext').html('hi');
-		
-		$.post(
-			'http://' + ip_address + ':8000/OF/',
-			'{"method":"get_switches","id":1}',
-			function(data) {
-				//$('#sometext').html("Repsonse: <br/>" + data.result[1].dpid);
-				
-				$('#sometext2').html("Repsonse: <br/>" + JSON.stringify(data));
-				
-				//$('#sometext3').html("Repsonse: <br/>" + JSON.stringify(data.result[0].n_tables));
+
+	jQuery.ajax({
+		type: "POST",
+		url: 'http://mininet-vm/web/openflowproxy.php',
+		dataType: 'json',
+		data: {functionname: 'get_switches'},
+
+		success: function (obj, ts) {
+			if (!('error' in obj)) {
+				var result = obj.result;
+				$('#sometext2').html("Reponse: <br/>" + JSON.stringify(result)); 
+			} else {
+				console.log(obj.error);
 			}
-		);
-		
-		var args = '00-00-00-00-00-01';
-		
-		$.post(
-			'http://' + ip_address + ':8000/OF/',
-			'{"method":"get_flow_stats","params":{"dpid":"00-00-00-00-00-02"},"id":1}',
-			function(data) {
-				$('#sometext').html("Repsonse: <br/>" + JSON.stringify(data));
-			}
-		);
+		}
 	});
-	
+
+        jQuery.ajax({
+                type: "POST",
+                url: 'http://mininet-vm/web/openflowproxy.php',
+                dataType: 'json',
+                data: {functionname: 'get_flow_stats', s: '00-00-00-00-00-01'},
+
+                success: function (obj, ts) {
+                        if (!('error' in obj)) {
+                                var result = obj.result;
+                                $('#sometext').html("Reponse: <br/>" + JSON.stringify(result));
+                        } else {
+                                console.log(obj.error);
+                        }
+                }
+        });
+
 		
 	sigma.parsers.json('js/data.json', {
 		container: 'graph-container',
