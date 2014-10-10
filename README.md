@@ -12,7 +12,7 @@ Group Good COMS4200 Computer Networking II 2014. POX Application.
 * Step 2: run the scripts/install-repo.sh shell script and follow the prompts to create ssh keys, clone repo.
 
 ### 3. Install POX component
-Run scripts/install-pox-co.sh shell script.
+* Run scripts/install-pox-co.sh shell script.
 
 
 ### 4. Run POX
@@ -20,7 +20,8 @@ Run scripts/install-pox-co.sh shell script.
 * ./pox.py [forwarding_component] stats 
 * EXAMPLE: ./pox.py forwarding.hub stats
 * If you need logs: ./pox.py log.level --DEBUG forwarding.hub stats
-
+* Topo Discovery requires openflow.discovery and web.webcore
+* EXAMPLE: ./pox log.level --DEBUG forwarding.hub web.webcore openflow.discovery topo stats
 
 ### 5. Run mininet
 * Use whatever setup on mininet you like, ensure controller is set to remote.
