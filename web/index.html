@@ -75,6 +75,23 @@
         });
 
 
+        jQuery.ajax({
+                type: "POST",
+                url: 'http://mininet-vm/web/openflowproxy.php',
+                dataType: 'json',
+                data: {functionname: 'get_topo'},
+
+                success: function (obj, ts) {
+                        if (!('error' in obj)) {
+                                var result = obj.result;
+                                $('#sometext4').html("Reponse: <br/>" + JSON.stringify(result));
+                        } else {
+                                console.log(obj.error);
+                        }
+                }
+        });
+
+
 		
 	sigma.parsers.json('js/data.json', {
 		container: 'graph-container',
@@ -100,6 +117,10 @@
 
 	<h2>get_switch_desc</h2><br/>
 	<div id="sometext3"></div><br/>
+
+        <h2>get_topo</h2><br/>
+        <div id="sometext4"></div><br/>
+
 </div>
 
 </body>

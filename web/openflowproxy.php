@@ -10,8 +10,12 @@ if (!isset($_POST['functionname'])) {
 }
 
 if (!isset($result['error'])) {
+	if (strcmp($_POST['functionname'], 'get_topo') == 0) {
+		$url='http://mininet-vm:8000/Topo/';
+	} else {
+		$url='http://mininet-vm:8000/OF/';
+	}
 
-	$url='http://mininet-vm:8000/OF/';
 	$postData;
 
 	if (!isset($_POST['s'])) {
@@ -42,3 +46,5 @@ if (!isset($result['error'])) {
 
 	echo $result;
 }
+
+?>
