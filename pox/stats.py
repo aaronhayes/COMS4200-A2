@@ -9,6 +9,7 @@ Can use other forwarding devices.
 
 Requires 'peewee' installed to work,
 a script that does this is ../scripts/install-pythonsql.sh
+:)
 """
 
 from pox.core import core
@@ -49,23 +50,36 @@ class StatisticsMonitor (object) :
 		stats = flow_stats_to_list(event.stats)
 		#print (stats)
 		
+		dpid = dpidToStr(event.connection.dpid)
 		byte_count = 0
 		flow_count = 0
 		packet_count = 0
 		
 		for e in event.stats:
+			db_thread = DBWriteThread(dpid, e.byte_count, e.packet_count, 1, 
+				dl_src=e.match.dl_src,
+				dl_dst=e.match.dl_dst,
+				nw_src=e.match.nw_src,
+				nw_dst=e.match.nw_dst,
+				tp_src=e.match.tp_src,
+				tp_dst=e.match.tp_dst)
+			db_thread.start()
+
+		for e in event.stats:
 			byte_count += e.byte_count
 			packet_count += e.packet_count
 			flow_count += 1
+			
+
 		
 		log.info("Traffic From %s: %s bytes (%s packets) over %s flows",
-			dpidToStr(event.connection.dpid), byte_count, packet_count, flow_count)
-                
-                '''
-                Write to database. 
-                '''
-                write_thread = DBWriteThread(byte_count)
-                write_thread.start()
+			dpid, byte_count, packet_count, flow_count)
+				
+		'''
+		Write to database. 
+		'''
+		#write_thread = DBWriteThread(byte_count)
+		#write_thread.start()
 
 
 	def _handle_PortStatsReceived (self, event) :
@@ -75,8 +89,8 @@ class StatisticsMonitor (object) :
 
 def launch ():
 	"""
-        Main Function to Lanuch The Module
-        """
+	Main Function to Lanuch The Module
+	"""
 
 	core.registerNew(StatisticsMonitor)
 
@@ -99,50 +113,76 @@ dbname: poxdb
 user: pox
 passwd: pox
 
-Table details are in the Test_Table class comments.
+Table details are in the Stats class comments.
 '''
 db = MySQLDatabase('poxdb', host='127.0.0.1', user='pox', passwd='pox')
 
 class BaseModel (Model):
-        """
-        A base model using the mysql database.
-        All tables on that database are based off this class.
-        Not completely neccessary but is convention for peewee.
-        """
-    
-        class Meta:
-                database = db
+	"""
+	A base model using the mysql database.
+	All tables on that database are based off this class.
+	Not completely neccessary but is convention for peewee.
+	"""
+
+	class Meta:
+		database = db
 
 
-class Test_Table (BaseModel):
-        """
-        A testing table with only 2 columns.
-        The SQL for this table is:
-        
-        CREATE TABLE IF NOT EXISTS `test_table` (
-          `timestamp` date NOT NULL,
-          `byte_count` int(11) NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-        
-        copied directly from phpmyadmin export function.
-        """
-        
-        timestamp = DateTimeField()
-        count_bytes = IntegerField()
+class Stats (BaseModel):
+	"""
+	Stats table container.
+	"""
+
+	dpid = CharField()
+	datetime = DateTimeField()
+	dl_src = CharField()
+	dl_dst = CharField()
+	nw_src = CharField()
+	nw_dst = CharField()
+	tp_src = CharField()
+	tp_dst = CharField()
+	byte_count = IntegerField()
+	packet_count = IntegerField()
+	flow_count = IntegerField()
 
 
 class DBWriteThread (threading.Thread):
-        
-        def __init__(self, byte_count):
-                threading.Thread.__init__(self)
-                self._byte_count = byte_count
+	"""
+	Write to the database as a threaded operation.
 
-        def run(self):
-                record = Test_Table(timestamp=datetime.datetime.now(), count_bytes=self._byte_count)
- 
-                try:
-                        record.save()
-                except Exception:
-                        #log.warning("Unable to write to the database.")
-                        pass
-                
+	Arguments not specified will be entered as NULL values into the database.
+	"""
+		
+	def __init__(self, dpid, byte_count, packet_count, flow_count, **kwargs):
+		threading.Thread.__init__(self)
+		self.dpid = dpid
+		self.byte_count = byte_count
+		self.packet_count = packet_count
+		self.flow_count = flow_count
+		self.dl_src = kwargs.get('dl_src')
+		self.dl_dst = kwargs.get('dl_dst')
+		self.nw_src = kwargs.get('nw_src')
+		self.nw_dest = kwargs.get('nw_dst')
+		self.tp_src = kwargs.get('tp_src')
+		self.tp_dst = kwargs.get('tp_dst')
+
+	def run(self):
+		record = Stats(
+			datetime=datetime.datetime.now(),
+			dpid=self.dpid,
+			dl_src=self.dl_src,
+			dl_dst=self.dl_dst,
+			w_src=self.nw_src,
+			nw_dst=self.nw_dest,
+			tp_src=self.tp_src,
+			tp_dst=self.tp_dst,
+			byte_count=self.byte_count,
+			packet_count=self.packet_count,
+			flow_count=self.flow_count)
+
+		try:
+			record.save()
+		except Exception:
+			log.warning("Unable to write to the database.")
+			pass
+				
