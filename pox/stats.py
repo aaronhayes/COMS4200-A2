@@ -61,8 +61,9 @@ class StatisticsMonitor (object) :
 				dl_dst=e.match.dl_dst,
 				nw_src=e.match.nw_src,
 				nw_dst=e.match.nw_dst,
-				tp_src=str(e.match.tp_src),
-				tp_dst=str(e.match.tp_dst))
+				nw_proto=e.match.nw_proto,
+				tp_src=e.match.tp_src,
+				tp_dst=e.match.tp_dst)
 			db_thread.start()
 
 		for e in event.stats:
@@ -127,13 +128,14 @@ class Stats (BaseModel):
 	"""
 
 	dpid = CharField()
-	datetime = DateTimeField()
+	datetime = DateTimeField(index=True)
 	dl_src = CharField()
 	dl_dst = CharField()
 	nw_src = CharField()
 	nw_dst = CharField()
-	tp_src = CharField()
-	tp_dst = CharField()
+	nw_proto  = IntegerField()
+	tp_src = IntegerField()
+	tp_dst = IntegerField()
 	byte_count = IntegerField()
 	packet_count = IntegerField()
 	flow_count = IntegerField()
@@ -162,6 +164,7 @@ class DBWriteThread (threading.Thread):
 		self.dl_dst = kwargs.get('dl_dst')
 		self.nw_src = kwargs.get('nw_src')
 		self.nw_dst = kwargs.get('nw_dst')
+		self.nw_proto = kwargs.get('nw_proto')
 		self.tp_src = kwargs.get('tp_src')
 		self.tp_dst = kwargs.get('tp_dst')
 
@@ -172,14 +175,15 @@ class DBWriteThread (threading.Thread):
 		# Run a select query on the database to find existing records for the same flow
 		# in the last <timedelta> seconds.
 		related_stats = Stats.select().where(
-			Stats.dpid == self.dpid and
-			datetime.datetime.now() - Stats.datetime < timedelta and
-			Stats.dl_src == self.dl_src and
-			Stats.dl_dst == self.dl_dst and
-			Stats.nw_src == self.nw_src and
-			Stats.nw_dst == self.nw_dst and
-			Stats.tp_src == self.tp_src and
-			Stats.tp_dst == self.tp_dst).limit(1)
+			(Stats.dpid == self.dpid) and
+			(Stats.datetime < (datetime.datetime.now() - timedelta)) and
+			(Stats.dl_src == self.dl_src) and
+			(Stats.dl_dst == self.dl_dst) and
+			(Stats.nw_src == self.nw_src) and
+			(Stats.nw_dst == self.nw_dst) and
+			(Stats.nw_proto == self.nw_proto) and
+			(Stats.tp_src == self.tp_src) and
+			(Stats.tp_dst == self.tp_dst))
 
 		# If the record exists, update the dateime/byte/packets.
 		# Otherwise create a new record.
@@ -196,6 +200,7 @@ class DBWriteThread (threading.Thread):
 				dl_dst=self.dl_dst,
 				nw_src=self.nw_src,
 				nw_dst=self.nw_dst,
+				nw_proto=self.nw_proto,
 				tp_src=self.tp_src,
 				tp_dst=self.tp_dst,
 				byte_count=self.byte_count,
