@@ -61,8 +61,8 @@ class StatisticsMonitor (object) :
 				dl_dst=e.match.dl_dst,
 				nw_src=e.match.nw_src,
 				nw_dst=e.match.nw_dst,
-				tp_src=e.match.tp_src,
-				tp_dst=e.match.tp_dst)
+				tp_src=str(e.match.tp_src),
+				tp_dst=str(e.match.tp_dst))
 			db_thread.start()
 
 		for e in event.stats:
@@ -70,16 +70,9 @@ class StatisticsMonitor (object) :
 			packet_count += e.packet_count
 			flow_count += 1
 			
-
 		
 		log.info("Traffic From %s: %s bytes (%s packets) over %s flows",
 			dpid, byte_count, packet_count, flow_count)
-				
-		'''
-		Write to database. 
-		'''
-		#write_thread = DBWriteThread(byte_count)
-		#write_thread.start()
 
 
 	def _handle_PortStatsReceived (self, event) :
@@ -151,38 +144,70 @@ class DBWriteThread (threading.Thread):
 	Write to the database as a threaded operation.
 
 	Arguments not specified will be entered as NULL values into the database.
+
+	When run, this will query the database for a record with matching dpid,dl,nw & tp dst/src
+	and then update if one exists or create a new record if one doesn't. Only records
+	within the last <timedelta> seconds are checked. That is, if a record matches but is
+	older than the timedelta, then a new record is created.
 	"""
 		
-	def __init__(self, dpid, byte_count, packet_count, flow_count, **kwargs):
+	def __init__ (self, dpid, byte_count, packet_count, flow_count, **kwargs):
 		threading.Thread.__init__(self)
 		self.dpid = dpid
 		self.byte_count = byte_count
 		self.packet_count = packet_count
 		self.flow_count = flow_count
+		# The following default to None/NULL if kwarg is not set.
 		self.dl_src = kwargs.get('dl_src')
 		self.dl_dst = kwargs.get('dl_dst')
 		self.nw_src = kwargs.get('nw_src')
-		self.nw_dest = kwargs.get('nw_dst')
+		self.nw_dst = kwargs.get('nw_dst')
 		self.tp_src = kwargs.get('tp_src')
 		self.tp_dst = kwargs.get('tp_dst')
 
-	def run(self):
-		record = Stats(
-			datetime=datetime.datetime.now(),
-			dpid=self.dpid,
-			dl_src=self.dl_src,
-			dl_dst=self.dl_dst,
-			w_src=self.nw_src,
-			nw_dst=self.nw_dest,
-			tp_src=self.tp_src,
-			tp_dst=self.tp_dst,
-			byte_count=self.byte_count,
-			packet_count=self.packet_count,
-			flow_count=self.flow_count)
+	def run (self):
+		# 5 seconds
+		timedelta = datetime.timedelta(0, 5)
 
+		# Run a select query on the database to find existing records for the same flow
+		# in the last <timedelta> seconds.
+		related_stats = Stats.select().where(
+			Stats.dpid == self.dpid and
+			datetime.datetime.now() - Stats.datetime < timedelta and
+			Stats.dl_src == self.dl_src and
+			Stats.dl_dst == self.dl_dst and
+			Stats.nw_src == self.nw_src and
+			Stats.nw_dst == self.nw_dst and
+			Stats.tp_src == self.tp_src and
+			Stats.tp_dst == self.tp_dst).limit(1)
+
+		# If the record exists, update the dateime/byte/packets.
+		# Otherwise create a new record.
+		if related_stats.count() > 0:
+			record = related_stats.first()
+			record.byte_count += self.byte_count
+			record.packet_count += self.packet_count
+			record.flow_count += 1
+		else:
+			record = Stats(
+				datetime=datetime.datetime.now(),
+				dpid=self.dpid,
+				dl_src=self.dl_src,
+				dl_dst=self.dl_dst,
+				nw_src=self.nw_src,
+				nw_dst=self.nw_dst,
+				tp_src=self.tp_src,
+				tp_dst=self.tp_dst,
+				byte_count=self.byte_count,
+				packet_count=self.packet_count,
+				flow_count=self.flow_count)
+
+		# This is the database write operation.
 		try:
 			record.save()
 		except Exception:
 			log.warning("Unable to write to the database.")
 			pass
 				
+
+
