@@ -49,7 +49,6 @@ class StatisticsMonitor (object) :
 
 	def _handle_FlowStatsReceived (self, event) :
 		stats = flow_stats_to_list(event.stats)
-		#print (stats)
 		
 		dpid = dpidToStr(event.connection.dpid)
 		byte_count = 0
@@ -73,7 +72,7 @@ class StatisticsMonitor (object) :
 			flow_count += 1
 			
 		
-		log.info("Traffic From %s: %s bytes (%s packets) over %s flows",
+		log.debug("Traffic From %s: %s bytes (%s packets) over %s flows",
 			dpid, byte_count, packet_count, flow_count)
 
 
