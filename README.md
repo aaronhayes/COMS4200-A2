@@ -14,18 +14,20 @@ Group Good COMS4200 Computer Networking II 2014. POX Application.
 ### 3. Install POX component
 * Run scripts/install-pox-co.sh shell script.
 
+### 4. Initialise Database 
+* Run db/initaliseDB.sh script
 
-### 4. Run POX
+### 5. Run POX
 * cd ~/pox
 * ./pox.py [forwarding_component] stats 
-* EXAMPLE: ./pox.py forwarding.hub stats
-* If you need logs: ./pox.py log.level --DEBUG forwarding.hub stats
+* EXAMPLE: ./pox.py forwarding.l2_learning stats
+* If you need logs: ./pox.py log.level --DEBUG forwarding.l2_learning stats
 * Topo Discovery requires openflow.discovery and web.webcore
-* EXAMPLE: ./pox log.level --DEBUG forwarding.hub web.webcore openflow.discovery topo stats
+* EXAMPLE: ./pox log.level --DEBUG forwarding.l2_learning web.webcore openflow.discovery topo stats
 
-### 5. Run mininet
+### 6. Run mininet
 * Use whatever setup on mininet you like, ensure controller is set to remote.
 * example: sudo mn --topo single,3 --mac --controller remote,ip=127.0.0.1,port=6633
 
-### 6. Viewing Webpage
+### 7. Viewing Webpage
 * Simply navigate to http://mininet-VM/web/
