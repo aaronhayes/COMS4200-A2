@@ -9,7 +9,6 @@ Can use other forwarding devices.
 
 Requires 'peewee' installed to work,
 a script that does this is ../scripts/install-pythonsql.sh
-:)
 """
 
 from pox.core import core
@@ -30,6 +29,7 @@ def timer_function ():
 	"""
 	Request Flow and Port Stats
 	"""
+
 	for connection in core.openflow._connections.values():
 		connection.send(of.ofp_stats_request(body=of.ofp_flow_stats_request()))
 		connection.send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
@@ -40,6 +40,7 @@ class StatisticsMonitor (object) :
 	"""
 	POX/Openflow Module
 	"""
+
 	def __init__ (self):
 		core.openflow.addListeners(self)
 	
@@ -136,9 +137,9 @@ class Stats (BaseModel):
 	nw_proto  = IntegerField()
 	tp_src = IntegerField()
 	tp_dst = IntegerField()
-	byte_count = IntegerField()
-	packet_count = IntegerField()
-	flow_count = IntegerField()
+	byte_count = DoubleField()
+	packet_count = DoubleField()
+	flow_count = DoubleField()
 
 
 class DBWriteThread (threading.Thread):
@@ -152,7 +153,7 @@ class DBWriteThread (threading.Thread):
 	within the last <timedelta> seconds are checked. That is, if a record matches but is
 	older than the timedelta, then a new record is created.
 	"""
-		
+	
 	def __init__ (self, dpid, byte_count, packet_count, flow_count, **kwargs):
 		threading.Thread.__init__(self)
 		self.dpid = dpid
@@ -169,14 +170,14 @@ class DBWriteThread (threading.Thread):
 		self.tp_dst = kwargs.get('tp_dst')
 
 	def run (self):
-		# 5 seconds
-		timedelta = datetime.timedelta(0, 5)
+		# 5 seconds ago
+		timedelta = datetime.datetime.now() - datetime.timedelta(0, 5)
 
 		# Run a select query on the database to find existing records for the same flow
 		# in the last <timedelta> seconds.
 		related_stats = Stats.select().where(
 			(Stats.dpid == self.dpid) and
-			(Stats.datetime < (datetime.datetime.now() - timedelta)) and
+			#(Stats.datetime < timedelta) and
 			(Stats.dl_src == self.dl_src) and
 			(Stats.dl_dst == self.dl_dst) and
 			(Stats.nw_src == self.nw_src) and
@@ -185,10 +186,17 @@ class DBWriteThread (threading.Thread):
 			(Stats.tp_src == self.tp_src) and
 			(Stats.tp_dst == self.tp_dst))
 
+		record = None
+		# The SQL date check in the WHERE wasn't working for me so this is the replacement
+		for r in related_stats:
+			if r.datetime > timedelta:
+				record = r
+				break
+
 		# If the record exists, update the dateime/byte/packets.
 		# Otherwise create a new record.
-		if related_stats.count() > 0:
-			record = related_stats.first()
+		# This way of updating is vulnerable to race conditions but will do for now
+		if record != None:
 			record.byte_count += self.byte_count
 			record.packet_count += self.packet_count
 			record.flow_count += 1
