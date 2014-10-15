@@ -1,11 +1,12 @@
 <?php
-
+	$badgraph = 0;
+	$columnchart = 1;
 	//Connect to database now
 	
     $username = "root"; 
     $password = "";   
     $host = "localhost";
-    $database="coms";
+    $database="poxdb";
     
     $link = mysql_connect($host, $username, $password);
 	if(!$link) {
@@ -16,7 +17,7 @@
 	}
 	
 	//Build initial SQL query
-    $portlistsql = "SELECT  DISTINCT `Port` FROM  `teststuff` WHERE ";
+    $portlistsql = "SELECT DISTINCT `tp_src` FROM  `stats`";
 
 	//Process $_GET stuff now
 	//$getstring is used for the graph
@@ -25,26 +26,32 @@
 	if(isset($_GET["source"]) && ($_GET["source"] != null)) {
 		$source = $_GET["source"];
 		$getstring .= "source=".$source;
-		$portlistsql .= "`Source` = '".$source."'";
+		$portlistsql .= " WHERE `nw_src` = '".$source."'";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];
 		$getstring .= "&dest=".$dest;
-		$portlistsql .= " AND `Destination` = '".$dest."'";
+		$portlistsql .= " AND `nw_dst` = '".$dest."'";
 	}
 	if(isset($_GET["port"]) && ($_GET["port"] != null)) {
-		$port = $_GET["port"];
-		$getstring .= "&port=".$port;
+		if($_GET["port"] != "All") {
+			$getstring .= "&port=".$_GET["port"];
+		}
 	}
-	if(isset($_GET["tcpudp"]) && ($_GET["tcpudp"] != null)) {
-		$tcpudp = $_GET["tcpudp"];
-		$getstring .= "&tcpudp=".$tcpudp;
+	if(isset($_GET["protocol"]) && ($_GET["protocol"] != null)) {
+		$protocol = $_GET["protocol"];
+		if($protocol != "Any") {
+			$getstring .= "&protocol=".$protocol;
+		}
+	}
+	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+		$getstring .= "&unit=".$_GET["unit"];
 	}
 	//Finish our query up now with a semicolon
-	$portlistsql .= ";";
+	$portlistsql .= "ORDER BY tp_src ASC;";
 	
-	//Run the query and grab the results
-	///*
+	
+	//Run the query and store the results in an array
     $result = mysql_query($portlistsql);
     
     if ( ! $result ) {
@@ -59,9 +66,6 @@
 	for ($x = 0; $x < mysql_num_rows($result); $x++) {
         $portlist[$x] = mysql_result($result, $x);
     }
-	//*/
-	
-	//$portlist = array(1,2,3,4);
 	
 	mysql_close($link);
 ?>
@@ -89,33 +93,69 @@ path {
 <body>
 <!-- Add in some drop-down boxes to restrict based on port and crap-->
 <form action="test.php" method="get">
-	Port: <select name="port">
+	Unit:
+	<select name="unit">
+<?php
+	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+		if($_GET["unit"] == "Packets") {
+			echo "<option selected>Packets</option><option>Bytes</option>";
+		} else {
+			echo "<option>Packets</option><option selected>Bytes</option>";
+		}
+	}
+?>
+	</select>
 	
+	Port: 
+	<select name="port">
+		<option>All</option>
 	<?php
 		foreach($portlist as $port) {
-			?>
-
-                <option> <?php echo $port; ?> </option>>
-
-			<?php
+			if($port != null) {
+				if($port == $_GET["port"]) {
+					echo "<option selected>";
+				} else {
+					echo "<option>";
+				}
+				
+				echo $port."</option>";
+			}
 		}
-	?>
+	?>	
+	</select>    
 	
-	</select>   TCP/UDP:
-	<select name="tcpudp">
-		<option>TCP</option>
-		<option>UDP</option>
+	Protocol:
+	<select name="protocol">
+<?php	
+	$protocols = array("Any", "TCP", "UDP", "ICMP");
+	$to_echo = "";
+	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+		for($i=0; $i<count($protocols); $i++) {
+			$to_echo .= "<option "
+			//This bit adds selected if GET[protocol] matches that index
+			.($_GET["protocol"] == $protocols[$i] ? "selected" : "")
+			. ">".$protocols[$i]."</option>";
+		}
+	} else {
+		for($i=0; $i<count($protocols); $i++) {
+			$to_echo .= "<option>".$protocols[$i]."</option>";
+		}
+	}
+	echo $to_echo;
+?>
 	</select>
+	
 	<input type="hidden" name="source" value="<?php echo $source; ?>" />
 	<input type="hidden" name="dest"value="<?php echo $dest; ?>" />
 	<input type="submit" />
 </form>
-
 <!-- load the d3.js library -->    
 <script src="http://d3js.org/d3.v3.min.js"></script>
 
 <script>
-
+<?php
+if($badgraph) {
+?>
 // Set dimensions and padding of graph.
 var margin = {top: 30, right: 20, bottom: 30, left: 50},
     width = 1280 - margin.left - margin.right,
@@ -125,21 +165,43 @@ var margin = {top: 30, right: 20, bottom: 30, left: 50},
 var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 
 // Set the ranges
-var x = d3.time.scale().range([0, width]);
+//var x = d3.time.scale().range([0, width]);
+var x = d3.scale.ordinal().rangeRoundBands([0, width], 0);
 var y = d3.scale.linear().range([height, 0]);
 
+<?php 
+	if($graph == "line") {
+?>
 // Define the axes
 var xAxis = d3.svg.axis().scale(x)
     .orient("bottom").ticks(10);
+<?php
+	}
+	if($graph == "bar") {
+?>
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.time.format("%H:%M:%S"));
+<?php
+	}
+?>
 
 var yAxis = d3.svg.axis().scale(y)
     .orient("left").ticks(10);
 
+<?php 
+	if($graph == "line") {
+?>
+// Line graph stuff
 // Define the line
 var valueline = d3.svg.line()
-    .x(function(d) { return x(d.Timestamp); })
-    .y(function(d) { return y(d.Value); });
-    
+    .x(function(d) { return x(d.datetime); })
+    .y(function(d) { return y(d.byte_count); });
+<?php
+	}
+?>
+   
 // Adds the svg canvas
 var svg = d3.select("body")
     .append("svg")
@@ -149,42 +211,35 @@ var svg = d3.select("body")
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-// Get the data
-data = [
-{Timestamp:"30-Apr-12",Value:53.98},
-{Timestamp:"27-Apr-12",Value:67.00},
-{Timestamp:"26-Apr-12",Value:89.70},
-{Timestamp:"25-Apr-12",Value:99.00},
-{Timestamp:"24-Apr-12",Value:130.28},
-{Timestamp:"23-Apr-12",Value:166.70},
-{Timestamp:"20-Apr-12",Value:234.98},
-{Timestamp:"19-Apr-12",Value:345.44},
-{Timestamp:"18-Apr-12",Value:443.34},
-{Timestamp:"17-Apr-12",Value:543.70},
-{Timestamp:"16-Apr-12",Value:580.13},
-{Timestamp:"13-Apr-12",Value:605.23},
-{Timestamp:"12-Apr-12",Value:622.77},
-{Timestamp:"11-Apr-12",Value:626.20},
-{Timestamp:"10-Apr-12",Value:628.44},
-{Timestamp:"9-Apr-12",Value:636.23},
-{Timestamp:"5-Apr-12",Value:633.68},
-{Timestamp:"4-Apr-12",Value:624.31},
-{Timestamp:"3-Apr-12",Value:629.32},
-{Timestamp:"2-Apr-12",Value:618.63},
-];
-
-//d3.csv("data.csv", function(error, data) {
-//<? //echo $gestring; ?>
+// TODO: <? //echo $getstring; ?>
 d3.json("getData.php", function(error, data) {
    data.forEach(function(d) {
-        d.Timestamp = parseDate(d.Timestamp);
-        d.Value = +d.Value;
+        d.datetime = parseDate(d.datetime);
+        d.byte_count = +d.byte_count;
     });
 
     // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.Timestamp; }));
-    y.domain([0, d3.max(data, function(d) { return d.Value; })]);
+<?php 
+	if($graph == "line") {
+?>
+	//Line graph stuff
+    x.domain(d3.extent(data, function(d) { return d.datetime; }));
+<?php
+	}
+	if($graph == "bar") {
+?>	
+	//Bar chart stuff
+	x.domain(data.map(function(d) { return d.datetime; }));
+<?php
+	}
+?>
+	//Both
+    y.domain([0, d3.max(data, function(d) { return d.byte_count; })]);
 
+<?php 
+	if($graph == "line") {
+?>
+	//Line graph stuff
     // Add the valueline path.
     svg.append("path")
         .attr("class", "line")
@@ -200,8 +255,124 @@ d3.json("getData.php", function(error, data) {
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
-});
-//});
+<?php
+	}
+	if($graph == "bar") {
+?>		
+	//Bar chart stuff	
+	svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate(-90)" );
 
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Bytes");
+
+  svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .style("fill", "steelblue")
+      .attr("x", function(d) { return x(d.date); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); });
+<?php
+	}
+?>
+});
+<?php
+}
+?>
+
+<?php
+if($columnchart) {
+?>
+var margin = {top: 20, right: 20, bottom: 70, left: 80},
+    width = 600 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+ 
+// Parse the date / time
+var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+ 
+var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+ 
+var y = d3.scale.linear().range([height, 0]);
+ 
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.time.format("%M:%S"));
+ 
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10);
+ 
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+ 
+d3.json("../coms/getData.php<?php echo $getstring; ?>", function(error, data) {
+ 
+    data.forEach(function(d) {
+        d.XVal = parseDate(d.XVal);
+        d.YVal = +d.YVal;
+    });
+	
+  x.domain(data.map(function(d) { return d.XVal; }));
+  y.domain([0, d3.max(data, function(d) { return d.YVal; })]);
+ 
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate(-90)" );
+ 
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+<?php	  
+	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+		echo ".text(\"# ".$_GET["unit"]."\");";
+	}
+?>
+ 
+  svg.selectAll("bar")
+      .data(data)
+    .enter().append("rect")
+      .style("fill", "steelblue")
+      .attr("x", function(d) { return x(d.XVal); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.YVal); })
+      .attr("height", function(d) { return height - y(d.YVal); });
+ 
+});
+<?php
+}
+?>
 </script>
 </body>
