@@ -1,127 +1,26 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
 
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
-	<title>Network visualiser</title>
-	
-	<style type="text/css">
-		#graph-container {
-			max-width: 400px;
-			height: 400px;
-			margin: auto;
-		}
-	</style>
-	
-	<!-- <script src="js/d3.min.js"></script> //-->
-	<script src="js/jquery-2.1.1.min.js"></script>
-	<script src="js/sigma.min.js"></script>
-	<script src="js/plugins/sigma.parsers.json.min.js"></script>
-	
-	<script>
-	/*
-	Start pox with web.webcore and openflow.webservice - like:
-	./pox.py web.webcore openflow.webservice
-	
-	CHANGE THIS TO THE IP ADDRESS OF THE MININET VM, where the pox controller is running
-	*/
+<link rel="stylesheet" type="text/css" href="style.css"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 
-	jQuery.ajax({
-		type: "POST",
-		url: 'http://mininet-vm/web/openflowproxy.php',
-		dataType: 'json',
-		data: {functionname: 'get_switches'},
+<meta charset=utf-8 />
+<title>Query Node</title>
 
-		success: function (obj, ts) {
-			if (!('error' in obj)) {
-				var result = obj.result;
-				$('#sometext2').html("Reponse: <br/>" + JSON.stringify(result)); 
-			} else {
-				console.log(obj.error);
-			}
-		}
-	});
+  <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js">
+  </script>
 
-        jQuery.ajax({
-                type: "POST",
-                url: 'http://mininet-vm/web/openflowproxy.php',
-                dataType: 'json',
-                data: {functionname: 'get_flow_stats', s: '00-00-00-00-00-01'},
-
-                success: function (obj, ts) {
-                        if (!('error' in obj)) {
-                                var result = obj.result;
-                                $('#sometext').html("Reponse: <br/>" + JSON.stringify(result));
-                        } else {
-                                console.log(obj.error);
-                        }
-                }
-        });
-
-        jQuery.ajax({
-                type: "POST",
-                url: 'http://mininet-vm/web/openflowproxy.php',
-                dataType: 'json',
-                data: {functionname: 'get_switch_desc', s: '00-00-00-00-00-01'},
-
-                success: function (obj, ts) {
-                        if (!('error' in obj)) {
-                                var result = obj.result;
-                                $('#sometext3').html("Reponse: <br/>" + JSON.stringify(result));
-                        } else {
-                                console.log(obj.error);
-                        }
-                }
-        });
-
-
-        jQuery.ajax({
-                type: "POST",
-                url: 'http://mininet-vm/web/openflowproxy.php',
-                dataType: 'json',
-                data: {functionname: 'get_topo'},
-
-                success: function (obj, ts) {
-                        if (!('error' in obj)) {
-                                var result = obj.result;
-                                $('#sometext4').html("Reponse: <br/>" + JSON.stringify(result));
-                        } else {
-                                console.log(obj.error);
-                        }
-                }
-        });
-
-
-		
-	sigma.parsers.json('js/data.json', {
-		container: 'graph-container',
-		settings: {
-			defaultNodeColor: '#999999'
-		}
-	});
-	</script>
-	
+ <script type="text/javascript" src="nodeinput.js"></script>
 
 </head>
 <body>
+  <div id="cy"></div>
 
-<div id="container">
-	
-	<div id="graph-container"></div>
-	
-	<h2>get_flow_stats</h2><br/>
-	<div id="sometext"></div><br>
-	
-	<h2>get_switches</h2><br/>
-	<div id="sometext2"></div><br>
 
-	<h2>get_switch_desc</h2><br/>
-	<div id="sometext3"></div><br/>
 
-        <h2>get_topo</h2><br/>
-        <div id="sometext4"></div><br/>
 
-</div>
+
 
 </body>
 </html>
