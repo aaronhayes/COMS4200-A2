@@ -27,11 +27,11 @@
 	
 	if(isset($_GET["source"]) && ($_GET["source"] != null)) {
 		$source = $_GET["source"];
-		$query .= " WHERE `nw_src` = '".$source."'";
+		$query .= " WHERE `dl_src` = '".$source."'";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];
-		$query .= " AND `nw_dst` = '".$dest."'";
+		$query .= " AND `dl_dst` = '".$dest."'";
 	}
 	if(isset($_GET["port"]) && ($_GET["port"] != null)) {
 		$port = $_GET["port"];

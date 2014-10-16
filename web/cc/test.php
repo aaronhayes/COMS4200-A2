@@ -1,4 +1,10 @@
 <?php
+/* USAGE:
+   This should ALWAYS have $_GET["source"] and $_GET["dest"] set to the 
+   source and destination mac addresses of the link.  Port, protocol and unit
+   are optional, and will default to All, Any and Packets respectively.
+*/
+
 	$badgraph = 0;
 	$columnchart = 1;
 	//Connect to database now
@@ -26,12 +32,12 @@
 	if(isset($_GET["source"]) && ($_GET["source"] != null)) {
 		$source = $_GET["source"];
 		$getstring .= "source=".$source;
-		$portlistsql .= " WHERE `nw_src` = '".$source."'";
+		$portlistsql .= " WHERE `dl_src` = '".$source."'";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];
 		$getstring .= "&dest=".$dest;
-		$portlistsql .= " AND `nw_dst` = '".$dest."'";
+		$portlistsql .= " AND `dl_dst` = '".$dest."'";
 	}
 	if(isset($_GET["port"]) && ($_GET["port"] != null)) {
 		if($_GET["port"] != "All") {
