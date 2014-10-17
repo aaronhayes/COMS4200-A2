@@ -31,7 +31,7 @@
   setInterval(function() {
 	  jQuery.ajax({
 	                type: "POST",
-	                url: 'http://mininet-vm/web/openflowproxy.php',
+	                url: 'http://localhost/web/openflowproxy.php',
 	                dataType: 'json',
 	                data: {functionname: 'get_topo'},
 	 

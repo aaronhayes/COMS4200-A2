@@ -29,7 +29,7 @@ function objectLength(obj) {
         //        }
         //});
 
-function makegraph(var json1) {
+function makegraph(json1) {
 
 jsontext = [];
 //response
