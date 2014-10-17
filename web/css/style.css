@@ -3,9 +3,10 @@ body {
 }
 
 #cy {
-  height: 100%;
-  width: 100%;
-  position: absolute;
+  padding-top: 50px;
+  padding-left: 50px;
+  height: 300px;
+  width: 80%;
   left: 0;
   top: 0;
 }
