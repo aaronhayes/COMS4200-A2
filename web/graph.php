@@ -110,7 +110,7 @@
 <?php	
 	$protocols = array("Any", "TCP", "UDP", "ICMP");
 	$to_echo = "";
-	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+	if(isset($_GET["protocol"]) && ($_GET["protocol"] != null)) {
 		for($i=0; $i<count($protocols); $i++) {
 			$to_echo .= "<option "
 			//This bit adds selected if GET[protocol] matches that index
