@@ -17,7 +17,7 @@
 
   <h1>POX - Network Statistic UI</h1>
 
-  <div id="graph_container"> <?php include("test.php") ?> </div>
+  <div id="graph_container"> <?php include("graph.php") ?> </div>
   <br/><br/><br/>		
   <div id="cy"></div>
 
