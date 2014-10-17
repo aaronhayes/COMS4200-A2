@@ -2,21 +2,21 @@ $(function(){ // on dom ready
 
 jsontext = [];
 
-jQuery.ajax({
-                type: "POST",
-                url: 'http://mininet-vm/web/openflowproxy.php',
-                dataType: 'json',
-                data: {functionname: 'get_topo'},
- 
-                success: function (obj, ts) {
-                        if (!('error' in obj)) {
-                                var result = obj.result;
-                                jsontext =  JSON.stringify(result));
-                        } else {
-                                console.log(obj.error);
-                        }
-                }
-        });
+//jQuery.ajax({
+//                type: "POST",
+ //               url: 'http://mininet-vm/web/openflowproxy.php',
+  //              dataType: 'json',
+   //             data: {functionname: 'get_topo'},
+// 
+ //               success: function (obj, ts) {
+  //                      if (!('error' in obj)) {
+   //                             var result = obj.result;
+    //                            jsontext =  JSON.stringify(result));
+     //                   } else {
+      //                          console.log(obj.error);
+       //                 }
+        //        }
+        //});
 
 //response
 var jsontext_old = [{"n_tables":254,"ports":[{"hw_addr":"6a:43:eb:72:f9:a6","name":"s1-eth1","port_no":1},{"hw_addr":"26:21:db:05:0c:3c","name":"s1-eth2","port_no":2},{"hw_addr":"ae:ab:37:17:08:4e","name":"s1","port_no":65534}],"dpid":"00-00-00-00-00-01"},
