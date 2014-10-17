@@ -76,40 +76,19 @@
 	mysql_close($link);
 ?>
 
-<meta charset="utf-8">
-<style> /* set the CSS */
-
-body { font: 12px Arial;}
-
-path { 
-    stroke: steelblue;
-    stroke-width: 2;
-    fill: none;
-}
-
-.axis path,
-.axis line {
-    fill: none;
-    stroke: grey;
-    stroke-width: 1;
-    shape-rendering: crispEdges;
-}
-
-</style>
-<body>
 <!-- Add in some drop-down boxes to restrict based on port and crap-->
 <form action="test.php" method="get">
 	Unit:
 	<select name="unit">
-<?php
-	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
-		if($_GET["unit"] == "Packets") {
-			echo "<option selected>Packets</option><option>Bytes</option>";
-		} else {
-			echo "<option>Packets</option><option selected>Bytes</option>";
+	<?php
+		if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+			if($_GET["unit"] == "Packets") {
+				echo "<option selected>Packets</option><option>Bytes</option>";
+			} else {
+				echo "<option>Packets</option><option selected>Bytes</option>";
+			}
 		}
-	}
-?>
+	?>
 	</select>
 	
 	Port: 
@@ -381,4 +360,3 @@ d3.json("../coms/getData.php<?php echo $getstring; ?>", function(error, data) {
 }
 ?>
 </script>
-</body>
