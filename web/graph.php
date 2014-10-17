@@ -83,6 +83,8 @@
 			} else {
 				echo "<option>Packets</option><option selected>Bytes</option>";
 			}
+		} else {
+			echo "<option>Packets</option><option>Bytes</option>";
 		}
 	?>
 	</select>
