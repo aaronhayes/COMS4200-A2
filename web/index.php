@@ -23,5 +23,28 @@
   <br/><br/><br/>		
   <div id="cy"></div>
 
+  <script>
+  setInterval(function() {
+	  jQuery.ajax({
+	                type: "POST",
+	                url: 'http://mininet-vm/web/openflowproxy.php',
+	                dataType: 'json',
+	                data: {functionname: 'get_topo'},
+	 
+	                success: function (obj, ts) {
+	                        if (!('error' in obj)) {
+	                                var result = obj.result;
+	                                makegraph(JSON.stringify(result));
+	                        } else {
+	                        		//dummy text
+	                                jsontext = {"switches":[{"dpid":"00-00-00-00-00-01"},{"dpid":"00-00-00-00-00-02"},{"dpid":"00-00-00-00-00-03"},{"dpid":"00-00-00-00-00-04"},{"dpid":"00-00-00-00-00-05"},{"dpid":"00-00-00-00-00-06"},{"dpid":"00-00-00-00-00-07"}],
+	"links":[["00-00-00-00-00-01","00-00-00-00-00-05"],["00-00-00-00-00-02","00-00-00-00-00-03"],["00-00-00-00-00-05","00-00-00-00-00-06"],["00-00-00-00-00-05","00-00-00-00-00-07"],["00-00-00-00-00-02","00-00-00-00-00-04"],["00-00-00-00-00-01","00-00-00-00-00-02"]]}
+
+	                        }
+	                }
+        });
+  }, 5000); //5 seconds
+  </script>
+
 </body>
 </html>

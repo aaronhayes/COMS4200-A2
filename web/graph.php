@@ -133,7 +133,7 @@
 	<input type="submit" />
 </form>
 
-<script>
+<script type="text/javascript">
 var margin = {top: 20, right: 20, bottom: 70, left: 80},
     width = 600 - margin.left - margin.right,
     height = 300 - margin.top - margin.bottom;

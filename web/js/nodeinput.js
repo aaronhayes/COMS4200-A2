@@ -1,6 +1,17 @@
 $(function(){ // on dom ready
 
-jsontext = [];
+//Genereate nodes
+function objectLength(obj) {
+  var result = 0;
+  for(var prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+    // or Object.prototype.hasOwnProperty.call(obj, prop)
+      result++;
+    }
+  }
+  return result;
+}
+
 
 //jQuery.ajax({
 //                type: "POST",
@@ -18,13 +29,18 @@ jsontext = [];
         //        }
         //});
 
+function makegraph(var json1) {
+
+jsontext = [];
 //response
 var jsontext_old = [{"n_tables":254,"ports":[{"hw_addr":"6a:43:eb:72:f9:a6","name":"s1-eth1","port_no":1},{"hw_addr":"26:21:db:05:0c:3c","name":"s1-eth2","port_no":2},{"hw_addr":"ae:ab:37:17:08:4e","name":"s1","port_no":65534}],"dpid":"00-00-00-00-00-01"},
 {"n_tables":254,"ports":[{"hw_addr":"22:61:48:86:af:96","name":"s2-eth1","port_no":1},{"hw_addr":"5e:e4:8b:78:42:c1","name":"s2-eth2","port_no":2},{"hw_addr":"ee:c3:9b:e5:8f:c8","name":"s2-eth3","port_no":3},{"hw_addr":"76:bd:34:0a:de:44","name":"s2","port_no":65534}],"dpid":"00-00-00-00-00-02"},
 {"n_tables":254,"ports":[{"hw_addr":"f2:b0:b3:2a:ef:6e","name":"s3-eth1","port_no":1},{"hw_addr":"de:56:24:ec:0b:50","name":"s3-eth2","port_no":2},{"hw_addr":"12:ca:92:49:d6:47","name":"s3","port_no":65534}],"dpid":"00-00-00-00-00-03"}];
 
-jsontext = {"switches":[{"dpid":"00-00-00-00-00-01"},{"dpid":"00-00-00-00-00-02"},{"dpid":"00-00-00-00-00-03"},{"dpid":"00-00-00-00-00-04"},{"dpid":"00-00-00-00-00-05"},{"dpid":"00-00-00-00-00-06"},{"dpid":"00-00-00-00-00-07"}],
-"links":[["00-00-00-00-00-01","00-00-00-00-00-05"],["00-00-00-00-00-02","00-00-00-00-00-03"],["00-00-00-00-00-05","00-00-00-00-00-06"],["00-00-00-00-00-05","00-00-00-00-00-07"],["00-00-00-00-00-02","00-00-00-00-00-04"],["00-00-00-00-00-01","00-00-00-00-00-02"]]}
+//jsontext = {"switches":[{"dpid":"00-00-00-00-00-01"},{"dpid":"00-00-00-00-00-02"},{"dpid":"00-00-00-00-00-03"},{"dpid":"00-00-00-00-00-04"},{"dpid":"00-00-00-00-00-05"},{"dpid":"00-00-00-00-00-06"},{"dpid":"00-00-00-00-00-07"}],
+//"links":[["00-00-00-00-00-01","00-00-00-00-00-05"],["00-00-00-00-00-02","00-00-00-00-00-03"],["00-00-00-00-00-05","00-00-00-00-00-06"],["00-00-00-00-00-05","00-00-00-00-00-07"],["00-00-00-00-00-02","00-00-00-00-00-04"],["00-00-00-00-00-01","00-00-00-00-00-02"]]}
+
+jsontext = json1;
 
 var nodes1 = [];
 var edges1 = [];
@@ -52,18 +68,6 @@ for (var i = 0; i < objectLength(jsontext.links); i++) {
             strength: 50
         }
     })
-}
-
-//Genereate nodes
-function objectLength(obj) {
-  var result = 0;
-  for(var prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
-    // or Object.prototype.hasOwnProperty.call(obj, prop)
-      result++;
-    }
-  }
-  return result;
 }
 
 
@@ -123,8 +127,7 @@ $('#cy').cytoscape({
   }
 });
 
-
-
+} //End function
 
 
 
