@@ -6,6 +6,8 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
 <script type="text/javascript" src="js/nodeinput.js"></script>
+<!-- load the d3.js library -->    
+<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 
 <meta charset=utf-8 />
 <title>Query Node</title>

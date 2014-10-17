@@ -134,10 +134,8 @@
 	<input type="hidden" name="dest"value="<?php echo $dest; ?>" />
 	<input type="submit" />
 </form>
-<!-- load the d3.js library -->    
-<script src="http://d3js.org/d3.v3.min.js"></script>
 
-<script>
+
 <?php
 if($badgraph) {
 ?>
