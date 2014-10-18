@@ -62,7 +62,7 @@ for (var i = 0; i < arr1.length; i++) {
         }
     });
 
-     optionnodes += '<option>'+jsontext.switches[i].dpid+'</option>';
+     optionnodes += '<option>'+arr1[i].dpid+'</option>';
 }
 
 //Once got all the switches... add to the source and destination innherHTML
