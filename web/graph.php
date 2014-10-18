@@ -20,6 +20,8 @@
 	}
 	
 	//Build initial SQL query
+	$sourcelistsql = "SELECT DISTINCT `dl_src` FROM `stats` ORDER BY `dl_src` ASC;";
+	$destlistsql = "SELECT DISTINCT `dl_dest` FROM `stats` ORDER BY `dl_src` ASC;";
     $portlistsql = "SELECT DISTINCT `tp_src` FROM  `stats`";
 
 	//Process $_GET stuff now
@@ -61,18 +63,41 @@
 	//Finish our query up now with a semicolon
 	$portlistsql .= "ORDER BY tp_src ASC";
 	
-	//Run the query and store the results in an array
-    $result = mysql_query($portlistsql);
-    
+	//Run the queries and store the results in an array
+    $result = mysql_query($sourcelistsql); 
     if ( ! $result ) {
         echo mysql_error();
-		echo "<br />";
+		echo "<br />Sourcelistsql: ";
+		echo $sourcelistsql;
+        die;
+    }
+	$sourcelist = array();
+	for ($x = 0; $x < mysql_num_rows($result); $x++) {
+        $sourcelist[$x] = mysql_result($result, $x);
+    }
+	
+	//Destination
+	$result = mysql_query($destlistsql); 
+    if ( ! $result ) {
+        echo mysql_error();
+		echo "<br />Destlistsql: ";
+		echo $destlistsql;
+        die;
+    }
+	$destlist = array();
+	for ($x = 0; $x < mysql_num_rows($result); $x++) {
+        $destlist[$x] = mysql_result($result, $x);
+    }
+	
+	//Port
+	$result = mysql_query($portlistsql); 
+    if ( ! $result ) {
+        echo mysql_error();
+		echo "<br />Portlistsql: ";
 		echo $portlistsql;
         die;
     }
-	
 	$portlist = array();
-	
 	for ($x = 0; $x < mysql_num_rows($result); $x++) {
         $portlist[$x] = mysql_result($result, $x);
     }
@@ -84,8 +109,39 @@
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
 
 	<!-- These two drop-downs are filled in by nodeinput.js -->
-	<select id="source" name="source"><option>All</option></select>
-	<select id="dest" name="dest"><option>All</option></select>
+	Source:
+	<select id="source" name="source">
+		<option>All</option>
+		<?php
+			foreach($sourcelist as $sourcemac) {
+				if($sourcemac != null) {
+					if($sourcemac == $_GET["source"]) {
+						echo "<option selected>";
+					} else {
+						echo "<option>";
+					}
+					echo $sourcemac."</option>";
+				}
+			}
+		?>	
+	</select>
+	
+	Destination:
+	<select id="dest" name="dest">
+		<option>All</option>
+		<?php
+			foreach($destlist as $destmac) {
+				if($destmac != null) {
+					if($destmac == $_GET["dest"]) {
+						echo "<option selected>";
+					} else {
+						echo "<option>";
+					}
+					echo $destmac."</option>";
+				}
+			}
+		?>	
+	</select>
 
 	<!-- Might need to turn this into a quick bit of AJAX to update when a source and dest have been chosen... -->
 	Port: 
@@ -99,7 +155,6 @@
 				} else {
 					echo "<option>";
 				}
-				
 				echo $port."</option>";
 			}
 		}
