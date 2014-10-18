@@ -33,6 +33,8 @@
 			//Use WHERE 1 so that subsequent ANDs work fine
 			$query .= " WHERE 1";
 		}
+	} else {
+		$query .= " WHERE 1";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];

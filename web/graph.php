@@ -29,12 +29,20 @@
 	if(isset($_GET["source"]) && ($_GET["source"] != null)) {
 		$source = $_GET["source"];
 		$getstring .= "source=".$source;
-		$portlistsql .= " WHERE `dl_src` = '".$source."'";
+		if($source != "All") {
+			$portlistsql .= " WHERE `dl_src` = '".$source."'";
+		} else {
+			$portlistsql .= " WHERE 1";
+		}
+	} else {
+		$portlistsql .= " WHERE 1";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];
 		$getstring .= "&dest=".$dest;
-		$portlistsql .= " AND `dl_dst` = '".$dest."'";
+		if($dest != "All") {
+			$portlistsql .= " AND `dl_dst` = '".$dest."'";
+		}
 	}
 	if(isset($_GET["port"]) && ($_GET["port"] != null)) {
 		if($_GET["port"] != "All") {
