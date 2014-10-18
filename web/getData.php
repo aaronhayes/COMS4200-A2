@@ -51,7 +51,8 @@
 			$query .= " AND `nw_proto` = 1";
 		}
 	}
-	$query .= " AND `datetime` >= unix_timestamp(CURRENT_TIMESTAMP - INTERVAL 5 MINUTE) * 1000;";
+	// change that WHERE to be AND, this is just for quick testing without a source or dest or any other $_GET stuff
+	$query .= " WHERE `datetime` BETWEEN (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND NOW();";
 	
     $result = mysql_query($query);
     
