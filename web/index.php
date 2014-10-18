@@ -29,7 +29,7 @@
 
   <script>
   var oldjson = "";
-  setInterval(function() {
+  function ajaxcmd() {
 	  jQuery.ajax({
 	                type: "POST",
 	                url: 'http://localhost/web/openflowproxy.php',
@@ -41,7 +41,6 @@
 	                        		var result = obj.result;
 	                        	    if (oldjson != JSON.stringify(result)) {
 		                        	    oldjson = JSON.stringify(result);
-		                                
 		                                makegraph(oldjson);
 		                            }
 	                        } else {
@@ -52,7 +51,10 @@
 	                        }
 	                }
         });
-  }, 5000); //5 seconds
+  }
+
+  ajaxcmd();
+  setInterval(ajaxcmd,5000);
   </script>
 
 </body>
