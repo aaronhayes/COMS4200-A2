@@ -44,6 +44,7 @@ jsontext = json1;
 
 var nodes1 = [];
 var edges1 = [];
+var optionnodes;
 
 for (var i = 0; i < objectLength(jsontext.switches); i++) {
     nodes1.push({
@@ -56,7 +57,13 @@ for (var i = 0; i < objectLength(jsontext.switches); i++) {
             faveShape: 'triangle'
         }
     });
+
+     optionnodes .= '<option>'.jsontext.switches[i].dpid.'</option>';
 }
+
+//Once got all the switches... add to teh source and destination innheHTML
+document.getElementById("src").innerHTML = optionnodes;
+document.getElementById("dest").innerHTML = optionnodes;
 
 
 for (var i = 0; i < objectLength(jsontext.links); i++) {
