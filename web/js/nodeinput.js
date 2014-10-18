@@ -54,8 +54,8 @@ for (var i = 0; i < arr1.length; i++) {
     nodes1.push({
 
         data: {
-            id: jsontext.switches[i].dpid,
-            name:jsontext.switches[i].dpid,
+            id: arr1[i].dpid,
+            name: arr1[i].dpid,
             weight: 65, 
             faveColor: '#6FB1FC', 
             faveShape: 'triangle'
@@ -75,8 +75,8 @@ var arr2 = jsonparse.links.filter(function(x){return x.hasOwnProperty('dpid'); }
 for (var i = 0; i < arr2.length; i++) {
     edges1.push({
         data: {
-            source: jsontext.links[i][0],
-            target: jsontext.links[i][1],
+            source: arr2.links[i][0],
+            target: arr2.links[i][1],
             faveColor: '#6FB1FC',
             strength: 50
         }
