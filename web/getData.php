@@ -1,8 +1,8 @@
 <?php
 	$testing = 0;
 
-    $username = "root"; 
-    $password = "";   
+    $username = "pox"; 
+    $password = "pox";   
     $host = "localhost";
     $database="poxdb";
     
