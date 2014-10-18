@@ -1,4 +1,4 @@
-$(function(){ // on dom ready
+//$(function(){ // on dom ready
 
 //Genereate nodes
 function objectLength(obj) {
@@ -138,5 +138,5 @@ $('#cy').cytoscape({
 
 
 
-}); // on dom ready
+//}); // on dom ready
 
