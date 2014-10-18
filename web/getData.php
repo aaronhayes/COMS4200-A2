@@ -51,7 +51,7 @@
 			$query .= " AND `nw_proto` = 1";
 		}
 	}
-	$query .= ";";
+	$query .= " AND `datetime` >= unix_timestamp(CURRENT_TIMESTAMP - INTERVAL 5 MINUTE) * 1000;";
 	
     $result = mysql_query($query);
     
