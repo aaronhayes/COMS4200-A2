@@ -147,8 +147,8 @@
 
 <script type="text/javascript">
 var margin = {top: 20, right: 20, bottom: 70, left: 120},
-    width = 600 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+    width = 1280 - margin.left - margin.right,
+    height = 480 - margin.top - margin.bottom;
  
 // Parse the date / time
 var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;

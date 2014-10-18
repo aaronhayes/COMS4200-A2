@@ -26,7 +26,7 @@
 	$query .= " as YVal FROM  `stats`";
 	
 	if(isset($_GET["source"]) && ($_GET["source"] != null)) {
-		$source = $_GET["source"];
+		$source = str_replace("-", ":", $_GET["source"]);
 		if($source != "All") {
 			$query .= " WHERE `dl_src` = '".$source."'";
 		} else {
@@ -37,7 +37,7 @@
 		$query .= " WHERE 1";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
-		$dest = $_GET["dest"];
+		$dest = str_replace("-", ":", $_GET["dest"]);
 		if($dest != "All") {
 			$query .= " AND `dl_dst` = '".$dest."'";
 		}
