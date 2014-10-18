@@ -32,10 +32,10 @@
 		if($source != "All") {
 			$portlistsql .= " WHERE `dl_src` = '".$source."'";
 		} else {
-			$portlistsql .= " WHERE 1";
+			$portlistsql .= " WHERE 1 ";
 		}
 	} else {
-		$portlistsql .= " WHERE 1";
+		$portlistsql .= " WHERE 1 ";
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];
