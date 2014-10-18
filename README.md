@@ -23,7 +23,7 @@ Group Good COMS4200 Computer Networking II 2014. POX Application.
 * EXAMPLE: ./pox.py forwarding.l2_learning stats
 * If you need logs: ./pox.py log.level --DEBUG forwarding.l2_learning stats
 * Topo Discovery requires openflow.discovery and web.webcore
-* EXAMPLE: ./pox log.level --DEBUG forwarding.l2_learning web.webcore openflow.discovery topo stats
+* EXAMPLE: ./pox.py log.level --DEBUG forwarding.l2_learning web.webcore openflow.discovery topo stats
 
 ### 6. Run mininet
 * Use whatever setup on mininet you like, ensure controller is set to remote.
