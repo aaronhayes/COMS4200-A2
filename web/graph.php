@@ -76,8 +76,8 @@
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
 
 	<!-- These two drop-downs are filled in by nodeinput.js -->
-	<select id="source" name="source"></select>
-	<select id="dest" name="dest"></select>
+	<select id="source" name="source"><option>All</option></select>
+	<select id="dest" name="dest"><option>All</option></select>
 
 	<!-- Might need to turn this into a quick bit of AJAX to update when a source and dest have been chosen... -->
 	Port: 

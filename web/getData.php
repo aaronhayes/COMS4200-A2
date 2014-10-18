@@ -27,11 +27,18 @@
 	
 	if(isset($_GET["source"]) && ($_GET["source"] != null)) {
 		$source = $_GET["source"];
-		$query .= " WHERE `dl_src` = '".$source."'";
+		if($source != "All") {
+			$query .= " WHERE `dl_src` = '".$source."'";
+		} else {
+			//Use WHERE 1 so that subsequent ANDs work fine
+			$query .= " WHERE 1";
+		}
 	}
 	if(isset($_GET["dest"]) && ($_GET["dest"] != null)) {
 		$dest = $_GET["dest"];
-		$query .= " AND `dl_dst` = '".$dest."'";
+		if($dest != "All") {
+			$query .= " AND `dl_dst` = '".$dest."'";
+		}
 	}
 	if(isset($_GET["port"]) && ($_GET["port"] != null)) {
 		$port = $_GET["port"];
