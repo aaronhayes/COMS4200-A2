@@ -40,7 +40,7 @@
 	                        if (!('error' in obj)) {
 	                        		var result = obj.result;
 	                        	    if (oldjson != JSON.stringify(result)) {
-		                        	    oldjson = JSON.stringify(result));
+		                        	    oldjson = JSON.stringify(result);
 		                                
 		                                makegraph(oldjson);
 		                            }
