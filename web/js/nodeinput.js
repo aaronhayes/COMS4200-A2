@@ -66,8 +66,8 @@ for (var i = 0; i < arr1.length; i++) {
 }
 
 //Once got all the switches... add to the source and destination innherHTML
-document.getElementById("source").innerHTML = optionnodes;
-document.getElementById("dest").innerHTML = optionnodes;
+//document.getElementById("source").innerHTML = optionnodes;
+//document.getElementById("dest").innerHTML = optionnodes;
 
 
 var arr2 = jsonparse.links.filter(function(x){return x.hasOwnProperty('dpid'); });
