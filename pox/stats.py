@@ -25,6 +25,8 @@ from peewee import *
 
 log = core.getLogger()
 
+timer_now = datetime.datetime.now()
+
 def timer_function ():
 	"""
 	Request Flow and Port Stats
@@ -33,6 +35,9 @@ def timer_function ():
 	for connection in core.openflow._connections.values():
 		connection.send(of.ofp_stats_request(body=of.ofp_flow_stats_request()))
 		connection.send(of.ofp_stats_request(body=of.ofp_port_stats_request()))
+
+	global timer_now
+	timer_now = datetime.datetime.now()
 	
 	log.debug("Sent %i flow/port stats requests", len(core.openflow._connections))
 
@@ -169,8 +174,15 @@ class DBWriteThread (threading.Thread):
 		self.tp_dst = kwargs.get('tp_dst')
 
 	def run (self):
+		# Use timer_now for time when Timer is run
+		# or uncomment datetime.now() for current time (after flow stats recieved)
+		# which may be after a network delay 
+		now = timer_now
+		print timer_now
+		#now = datetime.datetime.now()
+
 		# 5 seconds ago
-		timedelta = datetime.datetime.now() - datetime.timedelta(0, 5)
+		timedelta = now - datetime.timedelta(0, 5)
 
 		# Run a select query on the database to find existing records for the same flow
 		# in the last <timedelta> seconds.
@@ -201,7 +213,7 @@ class DBWriteThread (threading.Thread):
 			record.flow_count += 1
 		else:
 			record = Stats(
-				datetime=datetime.datetime.now(),
+				datetime=now,
 				dpid=self.dpid,
 				dl_src=self.dl_src,
 				dl_dst=self.dl_dst,
