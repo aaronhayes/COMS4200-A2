@@ -61,8 +61,8 @@ for (var i = 0; i < objectLength(jsontext.switches); i++) {
      optionnodes .= '<option>'.jsontext.switches[i].dpid.'</option>';
 }
 
-//Once got all the switches... add to teh source and destination innheHTML
-document.getElementById("src").innerHTML = optionnodes;
+//Once got all the switches... add to the source and destination innherHTML
+document.getElementById("source").innerHTML = optionnodes;
 document.getElementById("dest").innerHTML = optionnodes;
 
 

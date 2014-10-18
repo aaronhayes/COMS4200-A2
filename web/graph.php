@@ -74,21 +74,12 @@
 
 <!-- Add in some drop-down boxes to restrict based on port and crap-->
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
-	Unit:
-	<select name="unit">
-	<?php
-		if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
-			if($_GET["unit"] == "Packets") {
-				echo "<option selected>Packets</option><option>Bytes</option>";
-			} else {
-				echo "<option>Packets</option><option selected>Bytes</option>";
-			}
-		} else {
-			echo "<option>Packets</option><option>Bytes</option>";
-		}
-	?>
-	</select>
-	
+
+	<!-- These two drop-downs are filled in by nodeinput.js -->
+	<select name="source"></select>
+	<select name="dest"></select>
+
+	<!-- Might need to turn this into a quick bit of AJAX to update when a source and dest have been chosen... -->
 	Port: 
 	<select name="port">
 		<option>All</option>
@@ -105,7 +96,7 @@
 			}
 		}
 	?>	
-	</select>    
+	</select> 
 	
 	Protocol:
 	<select name="protocol">
@@ -128,8 +119,21 @@
 ?>
 	</select>
 	
-	<input type="hidden" name="source" value="<?php echo $source; ?>" />
-	<input type="hidden" name="dest"value="<?php echo $dest; ?>" />
+	Unit:
+	<select name="unit">
+	<?php
+		if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
+			if($_GET["unit"] == "Packets") {
+				echo "<option selected>Packets</option><option>Bytes</option>";
+			} else {
+				echo "<option>Packets</option><option selected>Bytes</option>";
+			}
+		} else {
+			echo "<option>Packets</option><option>Bytes</option>";
+		}
+	?>
+	</select>
+	
 	<input type="submit" />
 </form>
 
