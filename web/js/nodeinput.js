@@ -39,14 +39,18 @@ var jsontext_old = [{"n_tables":254,"ports":[{"hw_addr":"6a:43:eb:72:f9:a6","nam
 
 //jsontext = {"switches":[{"dpid":"00-00-00-00-00-01"},{"dpid":"00-00-00-00-00-02"},{"dpid":"00-00-00-00-00-03"},{"dpid":"00-00-00-00-00-04"},{"dpid":"00-00-00-00-00-05"},{"dpid":"00-00-00-00-00-06"},{"dpid":"00-00-00-00-00-07"}],
 //"links":[["00-00-00-00-00-01","00-00-00-00-00-05"],["00-00-00-00-00-02","00-00-00-00-00-03"],["00-00-00-00-00-05","00-00-00-00-00-06"],["00-00-00-00-00-05","00-00-00-00-00-07"],["00-00-00-00-00-02","00-00-00-00-00-04"],["00-00-00-00-00-01","00-00-00-00-00-02"]]}
-
+console.log(json1);
 jsontext = json1;
 
 var nodes1 = [];
 var edges1 = [];
-var optionnodes;
+var optionnodes = "<option>All</option>";
 
-for (var i = 0; i < objectLength(jsontext.switches); i++) {
+//Break it down to get length working
+jsonparse = JSON.parse(jsontext);
+var arr1 = jsonparse.switches.filter(function(x){return x.hasOwnProperty('dpid'); });
+
+for (var i = 0; i < arr1.length; i++) {
     nodes1.push({
 
         data: {
@@ -66,7 +70,9 @@ document.getElementById("source").innerHTML = optionnodes;
 document.getElementById("dest").innerHTML = optionnodes;
 
 
-for (var i = 0; i < objectLength(jsontext.links); i++) {
+var arr2 = jsonparse.links.filter(function(x){return x.hasOwnProperty('dpid'); });
+
+for (var i = 0; i < arr2.length; i++) {
     edges1.push({
         data: {
             source: jsontext.links[i][0],
