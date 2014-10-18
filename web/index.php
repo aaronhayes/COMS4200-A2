@@ -28,6 +28,7 @@
   <div id="cy"></div>
 
   <script>
+  var oldjson = "";
   setInterval(function() {
 	  jQuery.ajax({
 	                type: "POST",
@@ -37,8 +38,12 @@
 	 
 	                success: function (obj, ts) {
 	                        if (!('error' in obj)) {
-	                                var result = obj.result;
-	                                makegraph(JSON.stringify(result));
+	                        		var result = obj.result;
+	                        	    if (oldjson != JSON.stringify(result)) {
+		                        	    oldjson = JSON.stringify(result));
+		                                
+		                                makegraph(oldjson);
+		                            }
 	                        } else {
 	                        		//dummy text
 	                                jsontext = {"switches":[{"dpid":"00-00-00-00-00-01"},{"dpid":"00-00-00-00-00-02"},{"dpid":"00-00-00-00-00-03"},{"dpid":"00-00-00-00-00-04"},{"dpid":"00-00-00-00-00-05"},{"dpid":"00-00-00-00-00-06"},{"dpid":"00-00-00-00-00-07"}],
