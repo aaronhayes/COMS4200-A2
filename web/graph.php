@@ -21,7 +21,7 @@
 	
 	//Build initial SQL query
 	$sourcelistsql = "SELECT DISTINCT `dl_src` FROM `stats` ORDER BY `dl_src` ASC;";
-	$destlistsql = "SELECT DISTINCT `dl_dest` FROM `stats` ORDER BY `dl_src` ASC;";
+	$destlistsql = "SELECT DISTINCT `dl_dst` FROM `stats` ORDER BY `dl_dst` ASC;";
     $portlistsql = "SELECT DISTINCT `tp_src` FROM  `stats`";
 
 	//Process $_GET stuff now
