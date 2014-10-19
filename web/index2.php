@@ -71,7 +71,7 @@
       </li>
       <li data-id="qid" data-button="Next" data-options="tipLocation:right;tipAnimation:fade">
         <h2>Query</h2>
-        <p>Hit this button to generate the graph for the desired data. </p>
+        <p>Press this button to generate the graph for the desired data. </p>
       </li>
       <li data-id="graph" data-button="Next" data-options="tipLocation:top;tipAnimation:fade">
         <h2>Statistical Results</h2>
