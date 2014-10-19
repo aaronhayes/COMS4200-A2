@@ -1,5 +1,6 @@
-//$(function(){ // on dom ready
-
+/*
+GROUP I COMS4200 Assignment 2
+*/
 //Genereate nodes
 function objectLength(obj) {
   var result = 0;
@@ -11,24 +12,6 @@ function objectLength(obj) {
   }
   return result;
 }
-
-
-//jQuery.ajax({
-//                type: "POST",
- //               url: 'http://mininet-vm/web/openflowproxy.php',
-  //              dataType: 'json',
-   //             data: {functionname: 'get_topo'},
-// 
- //               success: function (obj, ts) {
-  //                      if (!('error' in obj)) {
-   //                             var result = obj.result;
-    //                            jsontext =  JSON.stringify(result));
-     //                   } else {
-      //                          console.log(obj.error);
-       //                 }
-        //        }
-        //});
-
 function makegraph(json1) {
 
 jsontext = [];
@@ -56,7 +39,7 @@ for (var i = 0; i < arr1.length; i++) {
         data: {
             id: arr1[i].dpid,
             name: arr1[i].dpid,
-            weight: 65, 
+            weight: 25, 
             faveColor: '#6FB1FC', 
             faveShape: 'triangle'
         }
@@ -64,6 +47,23 @@ for (var i = 0; i < arr1.length; i++) {
 
      optionnodes += '<option>'+arr1[i].dpid+'</option>';
 }
+var arrhosts = jsonparse.hosts.filter(function(x){return x.hasOwnProperty('dpid'); });
+
+for (var i = 0; i < arrhosts.length; i++) {
+    nodes1.push({
+
+        data: {
+            id: arrhosts[i].dpid,
+            name: arrhosts[i].dpid,
+            weight: 50,
+            faveColor: '#6FB1FC',
+            faveShape: 'square'
+        }
+    });
+
+     optionnodes += '<option>'+arrhosts[i].dpid+'</option>';
+}
+
 
 //Once got all the switches... add to the source and destination innherHTML
 //document.getElementById("source").innerHTML = optionnodes;
@@ -72,13 +72,13 @@ for (var i = 0; i < arr1.length; i++) {
 
 var arr2 = jsonparse.links.filter(function(x){return x.hasOwnProperty('dpid'); });
 
-for (var i = 0; i < arr2.length; i++) {
+for (var i = 0; i < objectLength(jsonparse.links); i++) {
     edges1.push({
         data: {
-            source: arr2.links[i][0],
-            target: arr2.links[i][1],
+            source: jsonparse.links[i][0],
+            target: jsonparse.links[i][1],
             faveColor: '#6FB1FC',
-            strength: 50
+            strength: 40
         }
     })
 }
@@ -111,7 +111,7 @@ $('#cy').cytoscape({
       .css({
         'opacity': 0.666,
         'width': 'mapData(strength, 70, 100, 2, 6)',
-        'target-arrow-shape': 'triangle',
+        'target-arrow-shape': 'circle',
         'source-arrow-shape': 'circle',
         'line-color': 'data(faveColor)',
         'source-arrow-color': 'data(faveColor)',
@@ -144,5 +144,4 @@ $('#cy').cytoscape({
 
 
 
-//}); // on dom ready
 
