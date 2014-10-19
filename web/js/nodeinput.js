@@ -55,7 +55,7 @@ for (var i = 0; i < arrhosts.length; i++) {
         data: {
             id: arrhosts[i].dpid,
             name: arrhosts[i].dpid,
-            weight: 50,
+            weight: 40,
             faveColor: '#6FB1FC',
             faveShape: 'square'
         }
@@ -97,7 +97,10 @@ $('#cy').cytoscape({
         'width': 'mapData(weight, 40, 80, 20, 60)',
         'content': 'data(name)',
         'text-valign': 'center',
-        'text-outline-width': 2,
+	'text-halign': 'center',
+        'text-outline-width': 1,
+	'font-size': 6,
+	'min-zoomed-font-size': 7,
         'text-outline-color': 'data(faveColor)',
         'background-color': 'data(faveColor)',
         'color': '#fff'
@@ -111,8 +114,8 @@ $('#cy').cytoscape({
       .css({
         'opacity': 0.666,
         'width': 'mapData(strength, 70, 100, 2, 6)',
-        'target-arrow-shape': 'circle',
-        'source-arrow-shape': 'circle',
+        'target-arrow-shape': 'none',
+        'source-arrow-shape': 'none',
         'line-color': 'data(faveColor)',
         'source-arrow-color': 'data(faveColor)',
         'target-arrow-color': 'data(faveColor)'
