@@ -10,7 +10,8 @@
     $connection = mysql_select_db($database, $server);
 	
 	//Base query to manipulate
-	$query = "SELECT  `datetime` as XVal, ";
+	$query = "SELECT  CONCAT(DATE_FORMAT(`datetime`, '%Y-%m-%d'), ' ',
+         SEC_TO_TIME((TIME_TO_SEC(`datetime`) DIV 5) * 5)) as XVal, ";
 	
 	if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
 		if($_GET["unit"] == "Bytes") {
