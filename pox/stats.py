@@ -27,6 +27,9 @@ log = core.getLogger()
 
 timer_now = datetime.datetime.now()
 
+update_list = list()
+update_thread = None
+
 def timer_function ():
 	"""
 	Request Flow and Port Stats
@@ -61,7 +64,7 @@ class StatisticsMonitor (object) :
 		packet_count = 0
 		
 		for e in event.stats:
-			db_thread = DBWriteThread(dpid, e.byte_count, e.packet_count, 1, 
+			db_row = StatsEventContainer(dpid, e.byte_count, e.packet_count, 1, 
 				dl_src=e.match.dl_src,
 				dl_dst=e.match.dl_dst,
 				nw_src=e.match.nw_src,
@@ -69,13 +72,18 @@ class StatisticsMonitor (object) :
 				nw_proto=e.match.nw_proto,
 				tp_src=e.match.tp_src,
 				tp_dst=e.match.tp_dst)
-			db_thread.start()
+			
+			update_list.append(db_row)
 
-		for e in event.stats:
 			byte_count += e.byte_count
 			packet_count += e.packet_count
 			flow_count += 1
-			
+
+		# Start update thread if is no longer running.
+		if (update_thread == None):
+			global update_thread
+			update_thread = DBThread()
+			update_thread.run()
 		
 		log.debug("Traffic From %s: %s bytes (%s packets) over %s flows",
 			dpid, byte_count, packet_count, flow_count)
@@ -146,34 +154,32 @@ class Stats (BaseModel):
 	flow_count = DoubleField()
 
 
-class DBWriteThread (threading.Thread):
+class DBThread (threading.Thread):
 	"""
-	Write to the database as a threaded operation.
-
-	Arguments not specified will be entered as NULL values into the database.
-
-	When run, this will query the database for a record with matching dpid,dl,nw & tp dst/src
-	and then update if one exists or create a new record if one doesn't. Only records
-	within the last <timedelta> seconds are checked. That is, if a record matches but is
-	older than the timedelta, then a new record is created.
+	A background thread that updates the database asynchronously.
 	"""
-	
-	def __init__ (self, dpid, byte_count, packet_count, flow_count, **kwargs):
+
+	def __init__ (self):
 		threading.Thread.__init__(self)
-		self.dpid = dpid
-		self.byte_count = byte_count
-		self.packet_count = packet_count
-		self.flow_count = flow_count
-		# The following default to None/NULL if kwarg is not set.
-		self.dl_src = kwargs.get('dl_src')
-		self.dl_dst = kwargs.get('dl_dst')
-		self.nw_src = kwargs.get('nw_src')
-		self.nw_dst = kwargs.get('nw_dst')
-		self.nw_proto = kwargs.get('nw_proto')
-		self.tp_src = kwargs.get('tp_src')
-		self.tp_dst = kwargs.get('tp_dst')
 
 	def run (self):
+		while len(update_list) > 0:
+			record = update_list.pop()
+
+			self.update_db(record)
+
+		global update_thread
+		update_thread = None
+
+
+	def update_db (self, row):
+		"""
+		When run, this will query the database for a record with matching dpid,dl,nw & tp dst/src
+		and then update if one exists or create a new record if one doesn't. Only records
+		within the last <timedelta> seconds are checked. That is, if a record matches but is
+		older than the timedelta, then a new record is created.
+		"""
+
 		# Use timer_now for time when Timer is run
 		# or uncomment datetime.now() for current time (after flow stats recieved)
 		# which may be after a network delay 
@@ -186,15 +192,15 @@ class DBWriteThread (threading.Thread):
 		# Run a select query on the database to find existing records for the same flow
 		# in the last <timedelta> seconds.
 		related_stats = Stats.select().where(
-			(Stats.dpid == self.dpid) and
+			(Stats.dpid == row.dpid) and
 			#(Stats.datetime < timedelta) and
-			(Stats.dl_src == self.dl_src) and
-			(Stats.dl_dst == self.dl_dst) and
-			(Stats.nw_src == self.nw_src) and
-			(Stats.nw_dst == self.nw_dst) and
-			(Stats.nw_proto == self.nw_proto) and
-			(Stats.tp_src == self.tp_src) and
-			(Stats.tp_dst == self.tp_dst))
+			(Stats.dl_src == row.dl_src) and
+			(Stats.dl_dst == row.dl_dst) and
+			(Stats.nw_src == row.nw_src) and
+			(Stats.nw_dst == row.nw_dst) and
+			(Stats.nw_proto == row.nw_proto) and
+			(Stats.tp_src == row.tp_src) and
+			(Stats.tp_dst == row.tp_dst))
 
 		record = None
 		# The SQL date check in the WHERE wasn't working for me so this is the replacement
@@ -207,23 +213,23 @@ class DBWriteThread (threading.Thread):
 		# Otherwise create a new record.
 		# This way of updating is vulnerable to race conditions but will do for now
 		if record != None:
-			record.byte_count += self.byte_count
-			record.packet_count += self.packet_count
+			record.byte_count += row.byte_count
+			record.packet_count += row.packet_count
 			record.flow_count += 1
 		else:
 			record = Stats(
 				datetime=now,
-				dpid=self.dpid,
-				dl_src=self.dl_src,
-				dl_dst=self.dl_dst,
-				nw_src=self.nw_src,
-				nw_dst=self.nw_dst,
-				nw_proto=self.nw_proto,
-				tp_src=self.tp_src,
-				tp_dst=self.tp_dst,
-				byte_count=self.byte_count,
-				packet_count=self.packet_count,
-				flow_count=self.flow_count)
+				dpid=row.dpid,
+				dl_src=row.dl_src,
+				dl_dst=row.dl_dst,
+				nw_src=row.nw_src,
+				nw_dst=row.nw_dst,
+				nw_proto=row.nw_proto,
+				tp_src=row.tp_src,
+				tp_dst=row.tp_dst,
+				byte_count=row.byte_count,
+				packet_count=row.packet_count,
+				flow_count=row.flow_count)
 
 		# This is the database write operation.
 		try:
@@ -231,6 +237,23 @@ class DBWriteThread (threading.Thread):
 		except Exception:
 			log.warning("Unable to write to the database.")
 			pass
-				
 
+
+class StatsEventContainer (object):
+	"""
+	A stats event container. 
+	"""
+	def __init__ (self, dpid, byte_count, packet_count, flow_count, **kwargs):
+		self.dpid = dpid
+		self.byte_count = byte_count
+		self.packet_count = packet_count
+		self.flow_count = flow_count
+		# The following default to None/NULL if kwarg is not set.
+		self.dl_src = kwargs.get('dl_src')
+		self.dl_dst = kwargs.get('dl_dst')
+		self.nw_src = kwargs.get('nw_src')
+		self.nw_dst = kwargs.get('nw_dst')
+		self.nw_proto = kwargs.get('nw_proto')
+		self.tp_src = kwargs.get('tp_src')
+		self.tp_dst = kwargs.get('tp_dst')
 
