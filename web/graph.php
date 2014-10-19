@@ -106,11 +106,12 @@
 ?>
 
 <!-- Add in some drop-down boxes to restrict based on port and crap-->
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
+<div class="form-group">
+<form class="form-inline" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
 
 	<!-- These two drop-downs are filled in by nodeinput.js -->
-	Source:
-	<select id="source" name="source">
+	<label for="source">Source:</label>
+	<select id="source" name="source" class="form-control">
 		<option>All</option>
 		<?php
 			foreach($sourcelist as $sourcemac) {
@@ -125,9 +126,9 @@
 			}
 		?>	
 	</select>
-	
-	Destination:
-	<select id="dest" name="dest">
+
+	<label for="dest">Destination:</label>
+	<select id="dest" name="dest" class="form-control">
 		<option>All</option>
 		<?php
 			foreach($destlist as $destmac) {
@@ -144,8 +145,8 @@
 	</select>
 
 	<!-- Might need to turn this into a quick bit of AJAX to update when a source and dest have been chosen... -->
-	Port: 
-	<select name="port">
+	<label for="port">Port:</label> 
+	<select name="port" id="port" class="form-control">
 		<option>All</option>
 	<?php
 		foreach($portlist as $port) {
@@ -161,8 +162,8 @@
 	?>	
 	</select> 
 	
-	Protocol:
-	<select name="protocol">
+	<label for="protocol">Protocol:</label>
+	<select name="protocol" id="protocol" class="form-control">
 <?php	
 	$protocols = array("Any", "TCP", "UDP", "ICMP");
 	$to_echo = "";
@@ -182,8 +183,8 @@
 ?>
 	</select>
 	
-	Unit:
-	<select name="unit">
+	<label for="unit">Unit:</label>
+	<select name="unit" class="form-control" id="unit">
 	<?php
 		if(isset($_GET["unit"]) && ($_GET["unit"] != null)) {
 			if($_GET["unit"] == "Packets") {
@@ -197,8 +198,9 @@
 	?>
 	</select>
 	
-	<input type="submit" />
+	<button type="submit" class="btn btn-primary">Query</button>
 </form>
+</div>
 
 <script type="text/javascript">
 var margin = {top: 20, right: 20, bottom: 70, left: 120},
