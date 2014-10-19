@@ -106,7 +106,7 @@
 ?>
 
 <!-- Add in some drop-down boxes to restrict based on port and crap-->
-<div class="form-group">
+<div class="form-group input-div">
 <form class="form-inline" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
 
 	<!-- These two drop-downs are filled in by nodeinput.js -->
@@ -146,7 +146,7 @@
 
 	<!-- Might need to turn this into a quick bit of AJAX to update when a source and dest have been chosen... -->
 	<label for="port">Port:</label> 
-	<select name="port" id="port" class="form-control">
+	<select id="port" name="port" class="form-control">
 		<option>All</option>
 	<?php
 		foreach($portlist as $port) {
@@ -198,13 +198,14 @@
 	?>
 	</select>
 	
-	<button type="submit" class="btn btn-primary">Query</button>
+	<button id="qid" type="submit" class="btn btn-primary">Query</button>
 </form>
 </div>
-
+<hr>
+<div id="graph"></div>
 <script type="text/javascript">
-var margin = {top: 20, right: 20, bottom: 70, left: 120},
-    width = 1280 - margin.left - margin.right,
+var margin = {top: 20, right: 20, bottom: 70, left:80},
+    width = 1180 - margin.left - margin.right,
     height = 480 - margin.top - margin.bottom;
  
 // Parse the date / time
@@ -224,7 +225,7 @@ var yAxis = d3.svg.axis()
     .orient("left")
     .ticks(10);
  
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#graph").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")

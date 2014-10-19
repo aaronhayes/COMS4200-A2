@@ -1,5 +1,6 @@
 body { 
   font: 14px helvetica neue, helvetica, arial, sans-serif;
+  background-color: #ccc !important;
 }
 
 #cy {
@@ -13,5 +14,29 @@ body {
 
 .row {
  padding-top:10px;
+}
 
+.input-div {
+ margin-left:40px;
+}
+
+hr {
+ margin: 20px 0;
+ border: solid 1px #aaa !important;
+ border-width: 1px 0 0 0;
+}
+
+p {
+ font-family: 'bariol_boldbold';
+ font-size: 18px;
+ padding-bottom: 5px;
+ line-height: 34px;
+ color: #aaa:
+}
+
+h1 {
+ font-family: 'bariol_boldbold' !important;
+ font-size: 28px !important;
+ padding-bottom: 5px !important;
+ line-height:34px !important; 
 }
