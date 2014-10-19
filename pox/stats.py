@@ -178,7 +178,6 @@ class DBWriteThread (threading.Thread):
 		# or uncomment datetime.now() for current time (after flow stats recieved)
 		# which may be after a network delay 
 		now = timer_now
-		print timer_now
 		#now = datetime.datetime.now()
 
 		# 5 seconds ago
