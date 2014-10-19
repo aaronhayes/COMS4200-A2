@@ -6,7 +6,7 @@ POX topology mointor
 Calculate the network topology with switches and links.
 Use JSON/Webserver to serve data
 
-Depends on openflow.discovery, web.webcore
+Depends on openflow.discovery, web.webcore, host_tracker
 
 based on https://github.com/MurphyMc/poxdesk/blob/master/tinytopo.py
 """
@@ -32,8 +32,10 @@ class Topo (object):
   	def __init__ (self):
     		self.switches = set()
     		self.links = set()
+		self.hosts = set()
 		core.openflow.addListeners(self)
 		core.openflow_discovery.addListeners(self)
+		core.host_tracker.addListeners(self)
     		log.debug("Ready to calculate topo.")
 
   	
@@ -59,13 +61,33 @@ class Topo (object):
       			self.links.add((s1,s2))
     		elif event.removed and (s1,s2) in self.links:
       			self.links.remove((s1,s2))
-		log.debug("Discovered Link between %s and %s.", s1, s2)
+		log.debug("Discovered Link Event between %s and %s.", s1, s2)
 	
-	
+	def _handle_HostEvent (self, event):
+		h = str(event.entry.macaddr)
+		s = dpidToStr(event.entry.dpid)
+		log.debug("Discovered Host Event for %s, under switch %s.", h, s)
+		
+		if event.leave:
+			if h in self.hosts:
+				self.hosts.remove(h)
+			if (h,s) in self.links:
+				self.links.remove((h,s))
+		else:
+			if h not in self.hosts:
+				self.hosts.add(h)
+		#	if (h,s) not in self.links:
+				self.links.add((h,s))
+
+				
+
 	def create_json (self):
 		res = {}
+		res['hosts'] = []
 		res['switches'] = []
 		res['links'] = []
+		for h in self.hosts:
+			res['hosts'].append({'dpid':h})
 		for s in self.switches:
 			res['switches'].append({'dpid':s})
 		for l in self.links:
