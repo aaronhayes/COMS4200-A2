@@ -213,8 +213,8 @@ class DBThread (threading.Thread):
 		# Otherwise create a new record.
 		# This way of updating is vulnerable to race conditions but will do for now
 		if record != None:
-			record.byte_count += row.byte_count
-			record.packet_count += row.packet_count
+			record.byte_count = row.byte_count
+			record.packet_count = row.packet_count
 			record.flow_count += 1
 		else:
 			record = Stats(
