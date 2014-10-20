@@ -204,7 +204,7 @@
 <hr>
 <div id="graph"></div>
 <script type="text/javascript">
-var margin = {top: 20, right: 20, bottom: 70, left:80},
+var margin = {top: 20, right: 20, bottom: 70, left:100},
     width = 1180 - margin.left - margin.right,
     height = 480 - margin.top - margin.bottom;
  
